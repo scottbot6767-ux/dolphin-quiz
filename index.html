@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>What Dolphin Are You? 🐬</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Bubblegum+Sans&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --pink: #FF6B9D;
+            --purple: #9B59B6;
+            --blue: #3498DB;
+            --teal: #1ABC9C;
+            --yellow: #F1C40F;
+            --orange: #E67E22;
+            --green: #2ECC71;
+        }
+
+        body {
+            font-family: 'Fredoka', sans-serif;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+            overflow-x: hidden;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Bubbles Background */
+        .bubbles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+            z-index: 0;
+        }
+
+        .bubble {
+            position: absolute;
+            bottom: -100px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            animation: rise 10s infinite ease-in;
+        }
+
+        .bubble:nth-child(1) { width: 40px; height: 40px; left: 10%; animation-duration: 8s; }
+        .bubble:nth-child(2) { width: 20px; height: 20px; left: 20%; animation-duration: 5s; animation-delay: 1s; }
+        .bubble:nth-child(3) { width: 50px; height: 50px; left: 35%; animation-duration: 7s; animation-delay: 2s; }
+        .bubble:nth-child(4) { width: 80px; height: 80px; left: 50%; animation-duration: 11s; animation-delay: 0s; }
+        .bubble:nth-child(5) { width: 35px; height: 35px; left: 55%; animation-duration: 6s; animation-delay: 1s; }
+        .bubble:nth-child(6) { width: 45px; height: 45px; left: 65%; animation-duration: 8s; animation-delay: 3s; }
+        .bubble:nth-child(7) { width: 25px; height: 25px; left: 70%; animation-duration: 9s; animation-delay: 2s; }
+        .bubble:nth-child(8) { width: 60px; height: 60px; left: 80%; animation-duration: 10s; animation-delay: 1s; }
+        .bubble:nth-child(9) { width: 30px; height: 30px; left: 90%; animation-duration: 6s; animation-delay: 4s; }
+        .bubble:nth-child(10) { width: 55px; height: 55px; left: 5%; animation-duration: 12s; animation-delay: 2s; }
+
+        @keyframes rise {
+            0% { bottom: -100px; transform: translateX(0) rotate(0deg); opacity: 0.5; }
+            50% { opacity: 0.8; }
+            100% { bottom: 110vh; transform: translateX(100px) rotate(720deg); opacity: 0; }
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 30px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            animation: popIn 0.5s ease-out;
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        h1 {
+            font-family: 'Bubblegum Sans', cursive;
+            font-size: 3rem;
+            color: var(--purple);
+            margin-bottom: 10px;
+            text-shadow: 3px 3px 0 var(--pink);
+        }
+
+        .subtitle {
+            font-size: 1.3rem;
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        .dolphin-emoji {
+            font-size: 4rem;
+            animation: bounce 2s infinite;
+            display: inline-block;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .start-btn, .next-btn, .restart-btn {
+            background: linear-gradient(135deg, var(--pink), var(--purple));
+            color: white;
+            border: none;
+            padding: 20px 50px;
+            font-size: 1.5rem;
+            font-family: 'Fredoka', sans-serif;
+            font-weight: 600;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(155, 89, 182, 0.4);
+            margin-top: 20px;
+        }
+
+        .start-btn:hover, .next-btn:hover, .restart-btn:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 15px 40px rgba(155, 89, 182, 0.5);
+        }
+
+        /* Quiz Screen */
+        .quiz-screen {
+            display: none;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: #eee;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--teal), var(--blue), var(--purple), var(--pink));
+            background-size: 200% 100%;
+            animation: progressGlow 2s linear infinite;
+            border-radius: 10px;
+            transition: width 0.5s ease;
+        }
+
+        @keyframes progressGlow {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 200% 50%; }
+        }
+
+        .question-number {
+            font-size: 1rem;
+            color: var(--purple);
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .question {
+            font-family: 'Bubblegum Sans', cursive;
+            font-size: 2rem;
+            color: var(--purple);
+            margin-bottom: 30px;
+        }
+
+        .options {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .option {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            border: 3px solid transparent;
+            padding: 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Fredoka', sans-serif;
+            font-size: 1.1rem;
+            color: #333;
+        }
+
+        .option:hover {
+            transform: translateY(-3px);
+            border-color: var(--purple);
+            box-shadow: 0 10px 25px rgba(155, 89, 182, 0.2);
+        }
+
+        .option.selected {
+            background: linear-gradient(135deg, var(--purple), var(--pink));
+            color: white;
+            border-color: var(--purple);
+            transform: scale(1.02);
+        }
+
+        .option-icon {
+            font-size: 2rem;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        /* Result Screen */
+        .result-screen {
+            display: none;
+        }
+
+        .result-card {
+            background: linear-gradient(135deg, var(--teal), var(--blue));
+            border-radius: 25px;
+            padding: 30px;
+            margin-bottom: 20px;
+            color: white;
+        }
+
+        .dolphin-name {
+            font-family: 'Bubblegum Sans', cursive;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .dolphin-type {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin-bottom: 20px;
+        }
+
+        .dolphin-image {
+            width: 100%;
+            max-width: 350px;
+            height: 220px;
+            object-fit: cover;
+            border-radius: 20px;
+            margin: 20px auto;
+            display: block;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            border: 5px solid white;
+        }
+
+        .dolphin-description {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            background: rgba(255,255,255,0.2);
+            padding: 20px;
+            border-radius: 15px;
+            margin-top: 20px;
+        }
+
+        .traits {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        .trait {
+            background: rgba(255,255,255,0.3);
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .share-text {
+            margin-top: 20px;
+            font-size: 1rem;
+            color: #666;
+        }
+
+        .confetti {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        @media (max-width: 600px) {
+            h1 { font-size: 2rem; }
+            .question { font-size: 1.5rem; }
+            .options { grid-template-columns: 1fr; }
+            .card { padding: 25px; }
+            .dolphin-name { font-size: 2rem; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Animated Bubbles -->
+    <div class="bubbles">
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+    </div>
+
+    <div class="container">
+        <!-- Start Screen -->
+        <div class="card" id="start-screen">
+            <span class="dolphin-emoji">🐬</span>
+            <h1>What Dolphin Are You?</h1>
+            <p class="subtitle">Answer 10 fun questions to discover your dolphin personality!</p>
+            <button class="start-btn" onclick="startQuiz()">Let's Splash In!</button>
+        </div>
+
+        <!-- Quiz Screen -->
+        <div class="card quiz-screen" id="quiz-screen">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress-fill"></div>
+            </div>
+            <p class="question-number" id="question-number">Question 1 of 10</p>
+            <h2 class="question" id="question"></h2>
+            <div class="options" id="options"></div>
+            <button class="next-btn" id="next-btn" onclick="nextQuestion()" style="display: none;">Next Question →</button>
+        </div>
+
+        <!-- Result Screen -->
+        <div class="card result-screen" id="result-screen">
+            <h1>You Are...</h1>
+            <div class="result-card" id="result-card">
+                <h2 class="dolphin-name" id="dolphin-name"></h2>
+                <p class="dolphin-type" id="dolphin-type"></p>
+                <img class="dolphin-image" id="dolphin-image" src="" alt="Your dolphin">
+                <p class="dolphin-description" id="dolphin-description"></p>
+                <div class="traits" id="traits"></div>
+            </div>
+            <p class="share-text">Share with your friends and see what dolphin they are!</p>
+            <button class="restart-btn" onclick="restartQuiz()">Take Quiz Again! 🔄</button>
+        </div>
+    </div>
+
+    <canvas id="confetti-canvas" class="confetti"></canvas>
+
+    <script>
+        const questions = [
+            {
+                question: "What's your favorite color?",
+                options: [
+                    { icon: "💙", text: "Blue", traits: ["calm", "wise"] },
+                    { icon: "💗", text: "Pink", traits: ["playful", "loving"] },
+                    { icon: "💚", text: "Green", traits: ["adventurous", "nature"] },
+                    { icon: "💛", text: "Yellow", traits: ["cheerful", "sunny"] }
+                ]
+            },
+            {
+                question: "What's your favorite food?",
+                options: [
+                    { icon: "🍕", text: "Pizza", traits: ["fun", "social"] },
+                    { icon: "🍦", text: "Ice Cream", traits: ["sweet", "playful"] },
+                    { icon: "🍎", text: "Fruit", traits: ["healthy", "nature"] },
+                    { icon: "🍪", text: "Cookies", traits: ["cozy", "creative"] }
+                ]
+            },
+            {
+                question: "What's your favorite weather?",
+                options: [
+                    { icon: "☀️", text: "Sunny", traits: ["cheerful", "energetic"] },
+                    { icon: "🌧️", text: "Rainy", traits: ["calm", "dreamy"] },
+                    { icon: "🌈", text: "Rainbow Weather", traits: ["magical", "unique"] },
+                    { icon: "❄️", text: "Snowy", traits: ["cool", "adventurous"] }
+                ]
+            },
+            {
+                question: "Pick a best friend animal!",
+                options: [
+                    { icon: "🐕", text: "Dog", traits: ["loyal", "playful"] },
+                    { icon: "🐈", text: "Cat", traits: ["independent", "mysterious"] },
+                    { icon: "🐢", text: "Turtle", traits: ["wise", "calm"] },
+                    { icon: "🦋", text: "Butterfly", traits: ["free", "beautiful"] }
+                ]
+            },
+            {
+                question: "What do you love to do?",
+                options: [
+                    { icon: "🎨", text: "Draw & Paint", traits: ["creative", "dreamy"] },
+                    { icon: "⚽", text: "Play Sports", traits: ["energetic", "competitive"] },
+                    { icon: "📚", text: "Read Books", traits: ["wise", "curious"] },
+                    { icon: "🎮", text: "Play Games", traits: ["fun", "clever"] }
+                ]
+            },
+            {
+                question: "What time of day is the best?",
+                options: [
+                    { icon: "🌅", text: "Sunrise", traits: ["hopeful", "peaceful"] },
+                    { icon: "☀️", text: "Afternoon", traits: ["energetic", "social"] },
+                    { icon: "🌇", text: "Sunset", traits: ["dreamy", "romantic"] },
+                    { icon: "🌙", text: "Nighttime", traits: ["mysterious", "calm"] }
+                ]
+            },
+            {
+                question: "Where would you love to visit?",
+                options: [
+                    { icon: "🏖️", text: "Beach", traits: ["relaxed", "fun"] },
+                    { icon: "🏔️", text: "Mountains", traits: ["adventurous", "brave"] },
+                    { icon: "🌲", text: "Forest", traits: ["nature", "mysterious"] },
+                    { icon: "🎢", text: "Theme Park", traits: ["excited", "playful"] }
+                ]
+            },
+            {
+                question: "Pick a superpower!",
+                options: [
+                    { icon: "🦸", text: "Flying", traits: ["free", "adventurous"] },
+                    { icon: "👻", text: "Invisibility", traits: ["mysterious", "clever"] },
+                    { icon: "💪", text: "Super Strength", traits: ["brave", "protective"] },
+                    { icon: "🔮", text: "Mind Reading", traits: ["wise", "curious"] }
+                ]
+            },
+            {
+                question: "What's your favorite season?",
+                options: [
+                    { icon: "🌸", text: "Spring", traits: ["hopeful", "fresh"] },
+                    { icon: "🌴", text: "Summer", traits: ["fun", "energetic"] },
+                    { icon: "🍂", text: "Fall", traits: ["cozy", "peaceful"] },
+                    { icon: "⛄", text: "Winter", traits: ["magical", "cool"] }
+                ]
+            },
+            {
+                question: "What makes you happiest?",
+                options: [
+                    { icon: "👨‍👩‍👧‍👦", text: "Family Time", traits: ["loving", "loyal"] },
+                    { icon: "🎉", text: "Parties", traits: ["social", "fun"] },
+                    { icon: "🌟", text: "Achieving Goals", traits: ["determined", "brave"] },
+                    { icon: "🧘", text: "Quiet Time", traits: ["peaceful", "wise"] }
+                ]
+            }
+        ];
+
+        const dolphins = [
+            {
+                name: "Bubbles the Bottlenose",
+                type: "Bottlenose Dolphin",
+                image: "https://images.unsplash.com/photo-1607153333879-c174d265f1d2?w=600",
+                description: "You're super friendly and love making everyone smile! Just like bottlenose dolphins, you're smart, curious, and always ready to play. You make friends wherever you go!",
+                traits: ["Friendly", "Smart", "Playful"],
+                matchTraits: ["social", "fun", "playful", "friendly"]
+            },
+            {
+                name: "Zippy the Spinner",
+                type: "Spinner Dolphin",
+                image: "https://images.unsplash.com/photo-1570481662006-a3a1374699e8?w=600",
+                description: "You're full of energy and love to show off your moves! Spinner dolphins are famous for jumping and spinning - just like you love to dance and play!",
+                traits: ["Energetic", "Joyful", "Athletic"],
+                matchTraits: ["energetic", "excited", "competitive", "fun"]
+            },
+            {
+                name: "Shadow the Orca",
+                type: "Orca (Killer Whale)",
+                image: "https://images.unsplash.com/photo-1564550974352-c9968becfc37?w=600",
+                description: "You're a natural leader who protects their friends! Orcas are the biggest dolphins and super loyal to their families. You're brave and always stand up for what's right!",
+                traits: ["Brave", "Loyal", "Leader"],
+                matchTraits: ["brave", "protective", "loyal", "determined"]
+            },
+            {
+                name: "Sparkle the Pink River",
+                type: "Amazon River Dolphin",
+                image: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/56/Amazon_river_dolphin_4.jpg/640px-Amazon_river_dolphin_4.jpg",
+                description: "You're one of a kind! Pink river dolphins are rare and magical, just like you. You see the world differently and that makes you special!",
+                traits: ["Unique", "Magical", "Creative"],
+                matchTraits: ["unique", "creative", "magical", "dreamy"]
+            },
+            {
+                name: "Splash the Pacific",
+                type: "Pacific White-Sided Dolphin",
+                image: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c4/Lagenorhynchus_obliquidens.jpg/640px-Lagenorhynchus_obliquidens.jpg",
+                description: "Adventure is your middle name! You love exploring new places and trying new things. Just like Pacific White-Sided dolphins, you're always on the move!",
+                traits: ["Adventurous", "Bold", "Explorer"],
+                matchTraits: ["adventurous", "nature", "free", "excited"]
+            },
+            {
+                name: "Dotty the Spotted",
+                type: "Atlantic Spotted Dolphin",
+                image: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f1/Spotted_dolphin.jpg/640px-Spotted_dolphin.jpg",
+                description: "You're curious about everything! Spotted dolphins love to investigate and learn. Your spots are like your unique thoughts - each one different and special!",
+                traits: ["Curious", "Clever", "Observant"],
+                matchTraits: ["curious", "wise", "clever", "observant"]
+            },
+            {
+                name: "Luna the Dusky",
+                type: "Dusky Dolphin",
+                image: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Duskydolphin.jpg/640px-Duskydolphin.jpg",
+                description: "You're a dreamer with a big heart! Dusky dolphins are known for being gentle and graceful. You love quiet moments and thinking about big ideas.",
+                traits: ["Dreamy", "Gentle", "Thoughtful"],
+                matchTraits: ["dreamy", "peaceful", "calm", "romantic"]
+            },
+            {
+                name: "Frost the Hourglass",
+                type: "Hourglass Dolphin",
+                image: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/69/Lagenorhynchus_cruciger.jpg/640px-Lagenorhynchus_cruciger.jpg",
+                description: "You're cool, mysterious, and love adventure in cold places! Hourglass dolphins live in icy waters and have awesome black and white patterns just like their unique personality - like you!",
+                traits: ["Cool", "Mysterious", "Independent"],
+                matchTraits: ["cool", "mysterious", "independent", "adventurous"]
+            },
+            {
+                name: "Sunny the Common",
+                type: "Common Dolphin",
+                image: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/90/Common_dolphin.jpg/640px-Common_dolphin.jpg",
+                description: "You bring sunshine everywhere you go! Common dolphins travel in big groups because they love being with friends. You're the heart of every group!",
+                traits: ["Cheerful", "Social", "Warm"],
+                matchTraits: ["cheerful", "sunny", "social", "loving"]
+            },
+            {
+                name: "Stripe the Striped",
+                type: "Striped Dolphin",
+                image: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d1/Stenella_coeruleoalba-cropped.jpg/640px-Stenella_coeruleoalba-cropped.jpg",
+                description: "You're fast, focused, and always reaching for your goals! Striped dolphins are some of the fastest swimmers. When you set your mind to something, nothing stops you!",
+                traits: ["Fast", "Determined", "Focused"],
+                matchTraits: ["determined", "competitive", "energetic", "brave"]
+            },
+            {
+                name: "Whisper the Risso's",
+                type: "Risso's Dolphin",
+                image: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/73/Grampus_griseus.jpg/640px-Grampus_griseus.jpg",
+                description: "You're wise beyond your years! Risso's dolphins are known for their beautiful scars that tell their life stories. You've learned a lot and love sharing your wisdom.",
+                traits: ["Wise", "Experienced", "Calm"],
+                matchTraits: ["wise", "calm", "peaceful", "hopeful"]
+            },
+            {
+                name: "Cozy the Irrawaddy",
+                type: "Irrawaddy Dolphin",
+                image: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0e/Irrawaddy_Dolphin.jpg/640px-Irrawaddy_Dolphin.jpg",
+                description: "You love comfort and making others feel at home! Irrawaddy dolphins have the cutest round faces and live in cozy river waters. You're everyone's favorite cuddle buddy!",
+                traits: ["Cozy", "Kind", "Gentle"],
+                matchTraits: ["cozy", "loving", "sweet", "gentle"]
+            }
+        ];
+
+        let currentQuestion = 0;
+        let selectedTraits = [];
+        let selectedOption = null;
+
+        function startQuiz() {
+            document.getElementById('start-screen').style.display = 'none';
+            document.getElementById('quiz-screen').style.display = 'block';
+            showQuestion();
+        }
+
+        function showQuestion() {
+            const q = questions[currentQuestion];
+            document.getElementById('question-number').textContent = `Question ${currentQuestion + 1} of ${questions.length}`;
+            document.getElementById('question').textContent = q.question;
+            document.getElementById('progress-fill').style.width = `${((currentQuestion) / questions.length) * 100}%`;
+            
+            const optionsDiv = document.getElementById('options');
+            optionsDiv.innerHTML = '';
+            
+            q.options.forEach((opt, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'option';
+                btn.innerHTML = `<span class="option-icon">${opt.icon}</span>${opt.text}`;
+                btn.onclick = () => selectOption(index, opt.traits);
+                optionsDiv.appendChild(btn);
+            });
+
+            document.getElementById('next-btn').style.display = 'none';
+            selectedOption = null;
+        }
+
+        function selectOption(index, traits) {
+            const options = document.querySelectorAll('.option');
+            options.forEach(opt => opt.classList.remove('selected'));
+            options[index].classList.add('selected');
+            selectedTraits = selectedTraits.concat(traits);
+            selectedOption = index;
+            document.getElementById('next-btn').style.display = 'inline-block';
+        }
+
+        function nextQuestion() {
+            if (selectedOption === null) return;
+            
+            currentQuestion++;
+            
+            if (currentQuestion >= questions.length) {
+                showResult();
+            } else {
+                showQuestion();
+            }
+        }
+
+        function showResult() {
+            document.getElementById('quiz-screen').style.display = 'none';
+            document.getElementById('result-screen').style.display = 'block';
+
+            // Count trait occurrences
+            const traitCounts = {};
+            selectedTraits.forEach(trait => {
+                traitCounts[trait] = (traitCounts[trait] || 0) + 1;
+            });
+
+            // Find best matching dolphin
+            let bestMatch = dolphins[0];
+            let bestScore = 0;
+
+            dolphins.forEach(dolphin => {
+                let score = 0;
+                dolphin.matchTraits.forEach(trait => {
+                    score += traitCounts[trait] || 0;
+                });
+                // Add some randomness for variety
+                score += Math.random() * 2;
+                if (score > bestScore) {
+                    bestScore = score;
+                    bestMatch = dolphin;
+                }
+            });
+
+            // Display result
+            const card = document.getElementById('result-card');
+            card.style.background = `linear-gradient(135deg, ${getRandomColor()}, ${getRandomColor()})`;
+            
+            document.getElementById('dolphin-name').textContent = bestMatch.name;
+            document.getElementById('dolphin-type').textContent = bestMatch.type;
+            document.getElementById('dolphin-image').src = bestMatch.image;
+            document.getElementById('dolphin-description').textContent = bestMatch.description;
+            
+            const traitsDiv = document.getElementById('traits');
+            traitsDiv.innerHTML = '';
+            bestMatch.traits.forEach(trait => {
+                const span = document.createElement('span');
+                span.className = 'trait';
+                span.textContent = trait;
+                traitsDiv.appendChild(span);
+            });
+
+            // Confetti!
+            launchConfetti();
+        }
+
+        function getRandomColor() {
+            const colors = ['#FF6B9D', '#9B59B6', '#3498DB', '#1ABC9C', '#F1C40F', '#E67E22', '#2ECC71'];
+            return colors[Math.floor(Math.random() * colors.length)];
+        }
+
+        function restartQuiz() {
+            currentQuestion = 0;
+            selectedTraits = [];
+            selectedOption = null;
+            document.getElementById('result-screen').style.display = 'none';
+            document.getElementById('start-screen').style.display = 'block';
+        }
+
+        // Simple confetti effect
+        function launchConfetti() {
+            const canvas = document.getElementById('confetti-canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+
+            const confetti = [];
+            const colors = ['#FF6B9D', '#9B59B6', '#3498DB', '#1ABC9C', '#F1C40F', '#E67E22', '#2ECC71'];
+
+            for (let i = 0; i < 150; i++) {
+                confetti.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height - canvas.height,
+                    w: Math.random() * 10 + 5,
+                    h: Math.random() * 10 + 5,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    speed: Math.random() * 3 + 2,
+                    angle: Math.random() * 360,
+                    spin: Math.random() * 10 - 5
+                });
+            }
+
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                let active = false;
+
+                confetti.forEach(c => {
+                    if (c.y < canvas.height) {
+                        active = true;
+                        c.y += c.speed;
+                        c.angle += c.spin;
+                        
+                        ctx.save();
+                        ctx.translate(c.x, c.y);
+                        ctx.rotate(c.angle * Math.PI / 180);
+                        ctx.fillStyle = c.color;
+                        ctx.fillRect(-c.w/2, -c.h/2, c.w, c.h);
+                        ctx.restore();
+                    }
+                });
+
+                if (active) {
+                    requestAnimationFrame(animate);
+                }
+            }
+
+            animate();
+        }
+    </script>
+</body>
+</html>
